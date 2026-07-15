@@ -1,4 +1,76 @@
----
+---import time
+import re
+
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+APPIUM_SERVER_URL = "http://127.0.0.1:4723"
+
+caps = {
+    "platformName": "Android",
+    "automationName": "UiAutomator2",
+    "deviceName": "Android",
+    "appPackage": "com.kbro.portal",
+    "appActivity": "com.kbro.portal.MainActivity",
+    "noReset": True,
+    "newCommandTimeout": 120
+}
+
+options = UiAutomator2Options().load_capabilities(caps)
+driver = webdriver.Remote(APPIUM_SERVER_URL, options=options)
+wait = WebDriverWait(driver, 20)
+
+try:
+    # 等主畫面元件出現，這裡請換成你實際畫面的元素定位
+    login_btn = wait.until(
+        EC.presence_of_element_located((AppiumBy.ACCESSIBILITY_ID, "登入"))
+    )
+    login_btn.click()
+
+    # 輸入帳號
+    account_input = wait.until(
+        EC.presence_of_element_located((AppiumBy.ID, "com.kbro.portal:id/account"))
+    )
+    account_input.clear()
+    account_input.send_keys("你的帳號")
+
+    # 輸入密碼
+    password_input = wait.until(
+        EC.presence_of_element_located((AppiumBy.ID, "com.kbro.portal:id/password"))
+    )
+    password_input.clear()
+    password_input.send_keys("你的密碼")
+
+    # 點擊登入
+    submit_btn = wait.until(
+        EC.element_to_be_clickable((AppiumBy.ID, "com.kbro.portal:id/btn_login"))
+    )
+    submit_btn.click()
+
+    time.sleep(2)
+
+    # OTP 驗證碼：示範從畫面文字或通知/簡訊來源取得後回填
+    otp = "123456"
+
+    otp_input = wait.until(
+        EC.presence_of_element_located((AppiumBy.ID, "com.kbro.portal:id/otp"))
+    )
+    otp_input.clear()
+    otp_input.send_keys(otp)
+
+    verify_btn = wait.until(
+        EC.element_to_be_clickable((AppiumBy.ID, "com.kbro.portal:id/btn_verify"))
+    )
+    verify_btn.click()
+
+finally:
+    time.sleep(3)
+    driver.quit()
+    
 hide:
   - toc
 
